@@ -1,0 +1,46 @@
+{% load static i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE  }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShiLee's Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'blog/styles.css' %}" />
+  </head>
+  <body>
+    <header>
+      <h1>ShiLee's Blog</h1>
+      <hr />
+    </header>
+    
+    <nav>
+      <ul>
+        <li><a href="{% url 'index' %}">{% trans "Artículos" %}</a></li>
+        <li><a href="{% url 'st' %}">{% trans "Historias Cortas" %}</a></li>
+        <li><a href="{% url 'poems' %}">{% trans "Poemas" %}</a></li>
+        <!-- Add more links if needed -->
+      </ul>
+    </nav>
+
+
+    <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <select name="language" onchange="this.form.submit()">
+            <option value="es" {% if LANGUAGE_CODE == "es" %}selected{% endif %}>{% trans "Español" %}</option>
+            <option value="en" {% if LANGUAGE_CODE == "en" %}selected{% endif %}>English</option>
+        </select>
+    </form>
+
+    <main>
+          {% block content %}
+          {% endblock %}
+    </main>
+
+    <footer>
+      <hr />
+      <small>&copy; 2025 Extraction Solutions. All rights reserved.</small>
+    </footer>
+  </body>
+</html>
