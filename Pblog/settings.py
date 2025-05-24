@@ -4,6 +4,7 @@ Django settings for Pblog project.
 
 from pathlib import Path
 from decouple import config, Csv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,7 +19,25 @@ SECRET_KEY = config('SECRET_KEY', default='unsafe-development-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='', cast=Csv())
+SECURE_PROXY_SSL_HEADER = tuple(config("SECURE_PROXY_SSL_HEADER", default="HTTP_X_FORWARDED_PROTO,https").split(","))
+
+# ✅ Retrieve SECURE_HSTS_SECONDS as an integer
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=31536000, cast=int)
+
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
+
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
+
+SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=False, cast=bool)
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=False, cast=bool)
+
+SECURE_PROXY_SSL_HEADER
+
+ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost', cast=Csv())
+print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 
 TIME_ZONE = config('TIME_ZONE', default='UTC')
 
@@ -50,6 +69,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+	"whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -80,19 +100,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Pblog.wsgi.application'
 
-# ----------------------------------------------------------
-# DATABASE CONFIGURATION WITH DECOUPLE
-# (You can switch to Postgres easily later)
-# ----------------------------------------------------------
-
-from dj_database_url import parse as db_url
-
 DATABASES = {
-    'default': config(
-        'DATABASE_URL',
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        cast=db_url
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 # Password validation
@@ -114,9 +126,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = config('STATIC_URL', default='/static/')
-STATIC_ROOT = config('STATIC_ROOT', default=str(BASE_DIR / 'staticfiles'))
+STATIC_URL = '/static/'
+print(STATIC_URL)
+#STATIC_ROOT = os.path.join(BASE_DIR, 'app1', 'static')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+print(STATIC_ROOT)
+
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'static'),
+#]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

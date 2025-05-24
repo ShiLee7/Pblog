@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    container_name: django-docker
+    container_name: django-docker-pblog
     volumes:
       - ./staticfiles:/app/staticfiles
       - ./db:/app/db # If using SQLite, otherwise remove this
